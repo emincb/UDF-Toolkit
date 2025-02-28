@@ -16,16 +16,40 @@ from reportlab.pdfbase.ttfonts import TTFont
 # Add a font that supports Turkish characters
 pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
 
+def is_zip_file(file_path):
+    """Check if the file is a valid ZIP file"""
+    try:
+        with zipfile.ZipFile(file_path, 'r') as z:
+            return True
+    except zipfile.BadZipFile:
+        return False
+
 def udf_to_pdf(udf_file, pdf_file):
-    # Open the UDF file and read the content.xml file
-    with zipfile.ZipFile(udf_file, 'r') as z:
-        if 'content.xml' in z.namelist():
-            with z.open('content.xml') as content_file:
-                tree = ET.parse(content_file, parser=ET.XMLParser(encoding='utf-8'))
-                root = tree.getroot()
-        else:
-            print("The 'content.xml' file could not be found in the UDF file.")
+    root = None
+    
+    # Check if the file is a ZIP file
+    if is_zip_file(udf_file):
+        # Process as a ZIP file
+        with zipfile.ZipFile(udf_file, 'r') as z:
+            if 'content.xml' in z.namelist():
+                with z.open('content.xml') as content_file:
+                    tree = ET.parse(content_file, parser=ET.XMLParser(encoding='utf-8'))
+                    root = tree.getroot()
+            else:
+                print("The 'content.xml' file could not be found in the UDF file.")
+                exit()
+    else:
+        # Process as an XML file directly
+        try:
+            tree = ET.parse(udf_file, parser=ET.XMLParser(encoding='utf-8'))
+            root = tree.getroot()
+        except ET.ParseError:
+            print(f"The file {udf_file} is neither a valid ZIP nor a valid XML file.")
             exit()
+
+    if root is None:
+        print("Failed to parse the file.")
+        exit()
 
     # Retrieve content text
     content_element = root.find('content')
