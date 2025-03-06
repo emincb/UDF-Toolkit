@@ -12,9 +12,17 @@ import io
 import zipfile
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT, TA_JUSTIFY
 
-# Add a font that supports Turkish characters
-pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+# Add fonts that support Turkish characters with bold and italic variations
+pdfmetrics.registerFont(TTFont('DejaVuSerif', 'DejaVuSerif.ttf'))
+pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold', 'DejaVuSerif-Bold.ttf'))
+pdfmetrics.registerFont(TTFont('DejaVuSerif-Italic', 'DejaVuSerif-Italic.ttf'))
+pdfmetrics.registerFont(TTFont('DejaVuSerif-BoldItalic', 'DejaVuSerif-BoldItalic.ttf'))
+
+# Create font family
+pdfmetrics.registerFontFamily('DejaVuSerif', normal='DejaVuSerif', bold='DejaVuSerif-Bold',
+                             italic='DejaVuSerif-Italic', boldItalic='DejaVuSerif-BoldItalic')
 
 def is_zip_file(file_path):
     """Check if the file is a valid ZIP file"""
@@ -23,6 +31,17 @@ def is_zip_file(file_path):
             return True
     except zipfile.BadZipFile:
         return False
+
+def get_alignment_style(alignment_value):
+    """Convert alignment value from XML to reportlab alignment constant"""
+    if alignment_value == "1":
+        return TA_CENTER
+    elif alignment_value == "3":
+        return TA_JUSTIFY
+    elif alignment_value == "2":
+        return TA_RIGHT
+    else:
+        return TA_LEFT
 
 def udf_to_pdf(udf_file, pdf_file):
     root = None
@@ -69,16 +88,40 @@ def udf_to_pdf(udf_file, pdf_file):
         elements = []
         styles = getSampleStyleSheet()
         
-        # Define a style that supports Turkish characters
-        normal_style = ParagraphStyle('CustomNormal', 
-                                      parent=styles['Normal'],
-                                      fontName='DejaVuSans',
-                                      encoding='utf-8')
+        # Define a base style that supports Turkish characters
+        base_style = ParagraphStyle('CustomNormal', 
+                                   parent=styles['Normal'],
+                                   fontName='DejaVuSerif',
+                                   encoding='utf-8')
+        
+        # Define styles for bold and italic text
+        bold_style = ParagraphStyle('CustomBold',
+                                   parent=base_style,
+                                   fontName='DejaVuSerif-Bold')
+        
+        italic_style = ParagraphStyle('CustomItalic',
+                                     parent=base_style,
+                                     fontName='DejaVuSerif-Italic')
+        
+        bold_italic_style = ParagraphStyle('CustomBoldItalic',
+                                         parent=base_style,
+                                         fontName='DejaVuSerif-BoldItalic')
 
         content_buffer = content_text
 
         for elem in elements_element:
             if elem.tag == 'paragraph':
+                # Get paragraph alignment
+                alignment = elem.get('Alignment', '0')
+                alignment_style = get_alignment_style(alignment)
+                
+                # Create a custom style for this paragraph with the right alignment
+                para_style = ParagraphStyle(
+                    f'Style{alignment}',
+                    parent=base_style,
+                    alignment=alignment_style
+                )
+                
                 # Process the paragraph content
                 paragraph_text = ''
                 for child in elem:
@@ -88,16 +131,50 @@ def udf_to_pdf(udf_file, pdf_file):
                         length = int(child.get('length', '0'))
                         text = content_buffer[start_offset:start_offset+length]
 
+                        # Get font size if specified
+                        if child.get('size'):
+                            font_size = float(child.get('size'))
+                            para_style.fontSize = font_size
+
                         # Get style information
+                        bold = child.get('bold', 'false') == 'true'
+                        italic = child.get('italic', 'false') == 'true'
+                        
+                        # Set font properties based on style
+                        current_style = para_style.clone('temp_style')
+                        if bold and italic:
+                            current_style.fontName = 'DejaVuSerif-BoldItalic'
+                            paragraph_text += f"<b><i>{text}</i></b>"
+                        elif bold:
+                            current_style.fontName = 'DejaVuSerif-Bold'
+                            paragraph_text += f"<b>{text}</b>"
+                        elif italic:
+                            current_style.fontName = 'DejaVuSerif-Italic'
+                            paragraph_text += f"<i>{text}</i>"
+                        else:
+                            paragraph_text += text
+                    elif child.tag == 'field':
+                        # Process field element (labels like DAVACI, VEKİLİ, etc.)
+                        field_name = child.get('fieldName', '')
+                        
+                        # Get the text from the content buffer if startOffset and length are provided
+                        if child.get('startOffset') and child.get('length'):
+                            start_offset = int(child.get('startOffset', '0'))
+                            length = int(child.get('length', '0'))
+                            field_text = content_buffer[start_offset:start_offset+length]
+                        else:
+                            # Use the fieldName as fallback
+                            field_text = field_name
+                        
+                        # Apply styling 
                         style = ''
                         if child.get('bold', 'false') == 'true':
                             style += '<b>'
                         if child.get('italic', 'false') == 'true':
                             style += '<i>'
-
-                        # Add the text
-                        paragraph_text += f"{style}{text}"
-
+                        
+                        paragraph_text += f"{style}{field_text}"
+                        
                         # Closing tags
                         if 'i' in style:
                             paragraph_text += '</i>'
@@ -114,8 +191,8 @@ def udf_to_pdf(udf_file, pdf_file):
                             img = Image(image_stream)
                             elements.append(img)
 
-                # Add the paragraph
-                elements.append(Paragraph(paragraph_text, normal_style))
+                # Add the paragraph with correct alignment
+                elements.append(Paragraph(paragraph_text, para_style))
                 elements.append(Spacer(1, 5))
             elif elem.tag == 'table':
                 # Create the table
@@ -128,22 +205,67 @@ def udf_to_pdf(udf_file, pdf_file):
                         cell_text = ''
                         paragraphs = cell.findall('paragraph')
                         for para in paragraphs:
+                            # Get paragraph alignment
+                            alignment = para.get('Alignment', '0')
+                            alignment_style = get_alignment_style(alignment)
+                            
+                            # Create a custom style for this cell with the right alignment
+                            cell_style = ParagraphStyle(
+                                f'CellStyle{alignment}',
+                                parent=base_style,
+                                alignment=alignment_style
+                            )
+                            
                             for child in para:
                                 if child.tag == 'content':
                                     start_offset = int(child.get('startOffset', '0'))
                                     length = int(child.get('length', '0'))
                                     text = content_buffer[start_offset:start_offset+length]
 
+                                    # Get font size if specified
+                                    if child.get('size'):
+                                        font_size = float(child.get('size'))
+                                        cell_style.fontSize = font_size
+
                                     # Get style information
+                                    bold = child.get('bold', 'false') == 'true'
+                                    italic = child.get('italic', 'false') == 'true'
+                                    
+                                    # Set font properties based on style
+                                    current_style = cell_style.clone('temp_cell_style')
+                                    if bold and italic:
+                                        current_style.fontName = 'DejaVuSerif-BoldItalic'
+                                        cell_text += f"<b><i>{text}</i></b>"
+                                    elif bold:
+                                        current_style.fontName = 'DejaVuSerif-Bold'
+                                        cell_text += f"<b>{text}</b>"
+                                    elif italic:
+                                        current_style.fontName = 'DejaVuSerif-Italic'
+                                        cell_text += f"<i>{text}</i>"
+                                    else:
+                                        cell_text += text
+                                elif child.tag == 'field':
+                                    # Process field element for table cells
+                                    field_name = child.get('fieldName', '')
+                                    
+                                    # Get the text from the content buffer
+                                    if child.get('startOffset') and child.get('length'):
+                                        start_offset = int(child.get('startOffset', '0'))
+                                        length = int(child.get('length', '0'))
+                                        field_text = content_buffer[start_offset:start_offset+length]
+                                    else:
+                                        # Use the fieldName as fallback
+                                        field_text = field_name
+                                    
+                                    # Apply styling 
                                     style = ''
                                     if child.get('bold', 'false') == 'true':
                                         style += '<b>'
                                     if child.get('italic', 'false') == 'true':
                                         style += '<i>'
-
-                                    # Add the text
-                                    cell_text += f"{style}{text}"
-
+                                    
+                                    cell_text += f"{style}{field_text}"
+                                    
                                     # Closing tags
                                     if 'i' in style:
                                         cell_text += '</i>'
@@ -154,7 +276,7 @@ def udf_to_pdf(udf_file, pdf_file):
                                 elif child.tag == 'image':
                                     # Images may not be supported inside tables
                                     pass
-                        row_data.append(Paragraph(cell_text, normal_style))
+                        row_data.append(Paragraph(cell_text, cell_style))
                     table_data.append(row_data)
                 # Set the table style
                 table_style = TableStyle([

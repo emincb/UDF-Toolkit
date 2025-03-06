@@ -160,3 +160,9 @@ cython_debug/
 #.idea/
 ~$test.docx
 .DS_Store
+.python-version
+hello.py
+pdf-test.pdf
+pyproject.toml
+*.udf
+*.lock
