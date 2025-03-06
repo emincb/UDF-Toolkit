@@ -6,7 +6,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer, Image
 from reportlab.lib import colors
-from reportlab.lib.units import mm
+from reportlab.lib.units import mm, inch
 import base64
 import io
 import zipfile
@@ -186,10 +186,26 @@ def udf_to_pdf(udf_file, pdf_file):
                         # Add the image
                         image_data = child.get('imageData')
                         if image_data:
-                            image_bytes = base64.b64decode(image_data)
-                            image_stream = io.BytesIO(image_bytes)
-                            img = Image(image_stream)
-                            elements.append(img)
+                            try:
+                                # Decode base64 image data
+                                image_bytes = base64.b64decode(image_data)
+                                image_stream = io.BytesIO(image_bytes)
+                                
+                                # Create reportlab image
+                                img = Image(image_stream)
+                                
+                                # Set a reasonable width/height if not specified
+                                if not hasattr(img, 'drawWidth') or not img.drawWidth:
+                                    img.drawWidth = 100
+                                if not hasattr(img, 'drawHeight') or not img.drawHeight:
+                                    img.drawHeight = 50
+                                
+                                # Add the image to the elements list
+                                elements.append(img)
+                            except Exception as e:
+                                print(f"Error processing image: {e}")
+                                # Add a placeholder text instead
+                                elements.append(Paragraph("[GÖRSEL]", para_style))
 
                 # Add the paragraph with correct alignment
                 elements.append(Paragraph(paragraph_text, para_style))
@@ -202,20 +218,23 @@ def udf_to_pdf(udf_file, pdf_file):
                     row_data = []
                     cells = row.findall('cell')
                     for cell in cells:
-                        cell_text = ''
+                        # Process the cell content
                         paragraphs = cell.findall('paragraph')
+                        cell_paragraphs = []
+                        
                         for para in paragraphs:
-                            # Get paragraph alignment
+                            # Create a custom style for this paragraph with the right alignment
                             alignment = para.get('Alignment', '0')
                             alignment_style = get_alignment_style(alignment)
                             
-                            # Create a custom style for this cell with the right alignment
                             cell_style = ParagraphStyle(
                                 f'CellStyle{alignment}',
                                 parent=base_style,
                                 alignment=alignment_style
                             )
                             
+                            # Process each child in the paragraph
+                            para_text = ""
                             for child in para:
                                 if child.tag == 'content':
                                     start_offset = int(child.get('startOffset', '0'))
@@ -231,19 +250,16 @@ def udf_to_pdf(udf_file, pdf_file):
                                     bold = child.get('bold', 'false') == 'true'
                                     italic = child.get('italic', 'false') == 'true'
                                     
-                                    # Set font properties based on style
-                                    current_style = cell_style.clone('temp_cell_style')
+                                    # Format text with style
                                     if bold and italic:
-                                        current_style.fontName = 'DejaVuSerif-BoldItalic'
-                                        cell_text += f"<b><i>{text}</i></b>"
+                                        para_text += f"<b><i>{text}</i></b>"
                                     elif bold:
-                                        current_style.fontName = 'DejaVuSerif-Bold'
-                                        cell_text += f"<b>{text}</b>"
+                                        para_text += f"<b>{text}</b>"
                                     elif italic:
-                                        current_style.fontName = 'DejaVuSerif-Italic'
-                                        cell_text += f"<i>{text}</i>"
+                                        para_text += f"<i>{text}</i>"
                                     else:
-                                        cell_text += text
+                                        para_text += text
+                                        
                                 elif child.tag == 'field':
                                     # Process field element for table cells
                                     field_name = child.get('fieldName', '')
@@ -258,30 +274,65 @@ def udf_to_pdf(udf_file, pdf_file):
                                         field_text = field_name
                                     
                                     # Apply styling 
-                                    style = ''
-                                    if child.get('bold', 'false') == 'true':
-                                        style += '<b>'
-                                    if child.get('italic', 'false') == 'true':
-                                        style += '<i>'
+                                    bold = child.get('bold', 'false') == 'true'
+                                    italic = child.get('italic', 'false') == 'true'
                                     
-                                    cell_text += f"{style}{field_text}"
-                                    
-                                    # Closing tags
-                                    if 'i' in style:
-                                        cell_text += '</i>'
-                                    if 'b' in style:
-                                        cell_text += '</b>'
+                                    # Format field text with style
+                                    if bold and italic:
+                                        para_text += f"<b><i>{field_text}</i></b>"
+                                    elif bold:
+                                        para_text += f"<b>{field_text}</b>"
+                                    elif italic:
+                                        para_text += f"<i>{field_text}</i>"
+                                    else:
+                                        para_text += field_text
+                                        
                                 elif child.tag == 'space':
-                                    cell_text += ' '
+                                    para_text += ' '
                                 elif child.tag == 'image':
-                                    # Images may not be supported inside tables
-                                    pass
-                        row_data.append(Paragraph(cell_text, cell_style))
+                                    # Process image element inside table cell
+                                    image_data = child.get('imageData')
+                                    if image_data:
+                                        try:
+                                            # Decode base64 image data
+                                            image_bytes = base64.b64decode(image_data)
+                                            image_stream = io.BytesIO(image_bytes)
+                                            
+                                            # Create reportlab image
+                                            img = Image(image_stream)
+                                            
+                                            # Set a reasonable width/height if not specified
+                                            if not hasattr(img, 'drawWidth') or not img.drawWidth:
+                                                img.drawWidth = 100
+                                            if not hasattr(img, 'drawHeight') or not img.drawHeight:
+                                                img.drawHeight = 50
+                                            
+                                            # For images in table cells, create a placeholder
+                                            para_text += f'<img src="data:image/png;base64,{image_data}" width="{img.drawWidth}" height="{img.drawHeight}"/>'
+                                        except Exception as e:
+                                            print(f"Error processing image in table cell: {e}")
+                                            # Add a placeholder text instead
+                                            para_text += "[GÖRSEL]"
+                            
+                            # Add this paragraph to the cell
+                            if para_text:
+                                cell_paragraphs.append(Paragraph(para_text, cell_style))
+                        
+                        # Check if we have any paragraphs
+                        if cell_paragraphs:
+                            row_data.append(cell_paragraphs)
+                        else:
+                            # If no content, add an empty Paragraph
+                            row_data.append(Paragraph("", base_style))
                     table_data.append(row_data)
                 # Set the table style
                 table_style = TableStyle([
                     ('GRID', (0,0), (-1,-1), 1, colors.black),
                     ('VALIGN', (0,0), (-1,-1), 'TOP'),
+                    ('LEFTPADDING', (0,0), (-1,-1), 3),
+                    ('RIGHTPADDING', (0,0), (-1,-1), 3),
+                    ('TOPPADDING', (0,0), (-1,-1), 3),
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 3),
                 ])
                 table = Table(table_data)
                 table.setStyle(table_style)

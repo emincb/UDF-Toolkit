@@ -166,3 +166,5 @@ pdf-test.pdf
 pyproject.toml
 *.udf
 *.lock
+*.pdf
+*.xml
