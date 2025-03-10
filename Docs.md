@@ -10,9 +10,6 @@
    - [Elemanlar Bölümü](#elemanlar-bölümü)
    - [Stiller Bölümü](#stiller-bölümü)
 6. [Detaylı Eleman Açıklamaları ve Özellik Örnekleri](#detaylı-eleman-açıklamaları-ve-özellik-örnekleri)
-7. [Tam Örnek](#tam-örnek)
-8. [En İyi Uygulamalar](#en-i̇yi-uygulamalar)
-9. [Sıkça Sorulan Sorular](#sıkça-sorulan-sorular)
 
 ## Genel Bakış
 Bu belge, belge şablonlama ve biçimlendirme için kullanılan UDF ve dahili XML formatının yapısını ve elemanlarını açıklar. Bu format, çeşitli biçimlendirme seçenekleri, tablolar, gömülü öğeler, üstbilgiler, altbilgiler ve listeler içeren zengin metin belgelerini temsil etmek için tasarlanmıştır.
@@ -58,6 +55,8 @@ XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
 ]]></content>
 ```
 
+**Önemli Not:** İçerik bölümü, tüm metinsel verileri içeren tek bir havuz olarak çalışır. `<elements>` bölümündeki `startOffset` ve `length` özellikleri, bu içerik havuzundaki belirli metin parçalarını referans alır.
+
 ### Özellikler Bölümü
 `<properties>` elemanı, sayfa düzenini tanımlayan özelliklerle bir `<pageFormat>` elemanı içerir:
 
@@ -77,10 +76,23 @@ XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
   - Değerler: Ondalık sayılar
   - Örnek: `headerFOffset="20.0"` (yaklaşık 0.7 cm)
 
+#### Arka Plan Görüntüsü
+`<properties>` bölümünde bir `<bgImage>` elemanı bulunabilir. Bu eleman, belge için arka plan görüntüsünü tanımlar:
+
+- `bgImageSource`: Görüntünün kaynak konumu
+  - Örnek: `bgImageSource="/resources/modules/dis/1.jpg"`
+
+- `bgImageData`: Base64 kodlanmış görüntü verisi
+  - Örnek: `bgImageData="iVBORw0KGgoAAAANSUhEUgAA..."`
+
+- `bgImageBottomMargin`, `bgImageUpMargin`, `bgImageRigtMargin`, `bgImageLeftMargin`: Arka plan görüntüsünün kenar boşlukları
+  - Örnek: `bgImageBottomMargin="28" bgImageUpMargin="28" bgImageRigtMargin="28" bgImageLeftMargin="28"`
+
 Örnek:
 ```xml
 <properties>
   <pageFormat mediaSizeName="1" leftMargin="42.51968479156494" rightMargin="42.51968479156494" topMargin="42.51968479156494" bottomMargin="70.8661413192749" paperOrientation="1" headerFOffset="20.0" footerFOffset="20.0" />
+  <bgImage bgImageSource="/resources/modules/dis/1.jpg" bgImageData="iVBORw0KGgoAAAANSUhEUgAA..." bgImageBottomMargin="28" bgImageUpMargin="28" bgImageRigtMargin="28" bgImageLeftMargin="28" />
 </properties>
 ```
 
@@ -94,6 +106,10 @@ XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
 5. Tablo
 6. Resim
 7. Sekme
+8. Sayfa Sonu
+
+`<elements>` elemanı bir `resolver` özelliğine sahip olabilir, bu özellik belgenin hangi stil çözümleyiciyi kullanacağını belirtir.
+Örnek: `<elements resolver="hvl-default">`
 
 ### Stiller Bölümü
 `<styles>` bölümü, belgede kullanılan metin stillerini tanımlar:
@@ -117,19 +133,32 @@ XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
 ## Detaylı Eleman Açıklamaları ve Özellik Örnekleri
 
 ### Üstbilgi
-`<header>` elemanı ile temsil edilir, üstbilgi içeriği için paragraflar içerir.
+`<header>` elemanı ile temsil edilir, üstbilgi içeriği için paragraflar içerir. Arka plan rengi ve metin rengi ayarlanabilir.
+
+Özellikler:
+- `background`: Üstbilgi arka plan rengi (RGB formatında)
+  - Örnek: `background="-8323073"` (açık mavi)
+
+- `foreground`: Üstbilgi metin rengi (RGB formatında)
+  - Örnek: `foreground="-16776961"` (mavi)
 
 Örnek:
 ```xml
-<header>
-  <paragraph name="hvl-default" family="Times New Roman" size="12" description="Gövde">
-    <content name="hvl-default" family="Times New Roman" size="12" description="Gövde" startOffset="0" length="14" />
+<header background="-8323073" foreground="-16776961">
+  <paragraph family="Times New Roman" size="12" description="Gövde">
+    <content family="Times New Roman" size="12" description="Gövde" startOffset="0" length="14" />
   </paragraph>
 </header>
 ```
 
 ### Altbilgi
 `<footer>` elemanı ile temsil edilir ve aşağıdaki özelliklere sahiptir:
+
+- `background`: Altbilgi arka plan rengi (RGB formatında)
+  - Örnek: `background="-8339328"` (açık yeşil)
+
+- `foreground`: Altbilgi metin rengi (RGB formatında)
+  - Örnek: `foreground="-16776961"` (mavi)
 
 - `pageNumber-spec`: Sayfa numarası özelliği
   - Örnek: `pageNumber-spec="BSP32_40"`
@@ -151,9 +180,9 @@ XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
 
 Örnek:
 ```xml
-<footer pageNumber-spec="BSP32_40" pageNumber-color="-16777216" pageNumber-fontFace="Arial" pageNumber-fontSize="11" pageNumber-foreStr="sayfa" pageNumber-pageStartNumStr="1">
+<footer background="-8339328" foreground="-16776961" pageNumber-spec="BSP32_40" pageNumber-color="-16777216" pageNumber-fontFace="Arial" pageNumber-fontSize="11" pageNumber-foreStr="sayfa" pageNumber-pageStartNumStr="1">
   <paragraph FirstLineIndent="2.5" family="Times New Roman" size="12">
-    <content FirstLineIndent="2.5" family="Times New Roman" size="12" startOffset="822" length="-11" />
+    <content FirstLineIndent="2.5" family="Times New Roman" size="12" startOffset="166" length="17" />
   </paragraph>
 </footer>
 ```
@@ -170,7 +199,7 @@ XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
 
 - `LineSpacing`: Satır aralığı
   - Değerler: Ondalık sayılar (1.0 tek aralık, 2.0 çift aralık)
-  - Örnek: `LineSpacing="0.5"` (yarım aralık)
+  - Örnek: `LineSpacing="1.0"` (tek aralık)
 
 - `TabSet`: Sekme durak pozisyonları ve türleri
   - Örnek: `TabSet="36.0:0:0"` (36 puntoda sekme durağı, sola hizalı)
@@ -196,11 +225,29 @@ XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
 - `FirstLineIndent`: İlk satır girintisi
   - Örnek: `FirstLineIndent="2.5"`
 
+- `family`: Paragraf için yazı tipi ailesi
+  - Örnek: `family="Times New Roman"`
+
+- `size`: Paragraf için varsayılan yazı tipi boyutu
+  - Örnek: `size="12"`
+
 Örnek:
 ```xml
-<paragraph Alignment="3" LineSpacing="0.5" TabSet="36.0:0:0" LeftIndent="36.0" Bulleted="true" BulletType="BULLET_TYPE_ELLIPSE" ListLevel="1" ListId="1">
-  <content startOffset="233" length="140" />
+<paragraph Alignment="0" LeftIndent="36.0" LineSpacing="1.0" family="Verdana">
+  <content family="Verdana" startOffset="77" length="19" />
 </paragraph>
+```
+
+### Sayfa Sonu
+`<page-break>` elemanı bir sayfa sonunu temsil eder ve içinde bir paragraf içerir.
+
+Örnek:
+```xml
+<page-break>
+  <paragraph>
+    <content startOffset="147" length="1" />
+  </paragraph>
+</page-break>
 ```
 
 ### İçerik
@@ -231,15 +278,17 @@ XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
   - Örnek: `background="-8239546"` (açık mavi)
 
 - `foreground`: Metin rengi (RGB formatında)
-  - Örnek: `foreground="-16777216"` (siyah)
+  - Örnek: `foreground="-196608"` (koyu yeşil)
+
+- `family`: Yazı tipi ailesi
+  - Örnek: `family="Verdana"`
 
 Örnek:
 ```xml
-<content bold="true" startOffset="16" length="39" />
-<content strikethrough="true" startOffset="469" length="9" />
-<content subscript="true" startOffset="484" length="3" />
-<content superscript="true" startOffset="496" length="4" />
-<content background="-8239546" foreground="-16777216" startOffset="545" length="13" />
+<content bold="true" startOffset="19" length="14" />
+<content italic="true" startOffset="33" length="15" />
+<content underline="true" startOffset="52" length="23" />
+<content family="Verdana" foreground="-196608" startOffset="105" length="9" />
 ```
 
 ### Tablo
@@ -249,21 +298,43 @@ Tablolar `<table>` elemanı ile temsil edilir ve aşağıdaki özelliklere sahip
   - Örnek: `tableName="Sabit"`
 
 - `columnCount`: Sütun sayısı
-  - Örnek: `columnCount="3"`
+  - Örnek: `columnCount="2"`
 
-- `columnSpans`: Sütun genişlikleri
-  - Örnek: `columnSpans="100,79,121"`
+- `columnSpans`: Sütun genişlikleri (punto cinsinden)
+  - Örnek: `columnSpans="100,100"`
 
 - `border`: Kenarlık stili
+  - Değerler: "borderCell" (tüm hücrelere kenarlık), "border" (dış kenarlık), "borderOuter" (sadece dış kenarlık)
   - Örnek: `border="borderCell"`
+
+- `rowSpans`: Satır yükseklikleri (punto cinsinden)
+  - Örnek: `rowSpans="428,428"`
+
+Satırlar `<row>` elemanı ile temsil edilir ve aşağıdaki özelliklere sahiptir:
+
+- `rowName`: Satırın adı
+  - Örnek: `rowName="row1"`
+
+- `rowType`: Satırın türü
+  - Örnek: `rowType="dataRow"`
+
+- `height_min`: Minimum satır yüksekliği
+  - Örnek: `height_min="1.5"`
+
+Hücreler `<cell>` elemanı ile temsil edilir ve her biri bir veya daha fazla paragraf içerebilir.
 
 Örnek:
 ```xml
-<table tableName="Sabit" columnCount="3" columnSpans="100,79,121" border="borderCell">
-  <row rowName="row1" rowType="dataRow">
+<table tableName="Sabit" columnCount="2" columnSpans="100,100" border="borderCell" rowSpans="428,428">
+  <row rowName="row1" rowType="dataRow" height_min="1.5">
     <cell>
-      <paragraph>
-        <content startOffset="787" length="1" />
+      <paragraph Alignment="0" LeftIndent="3.0" RightIndent="1.0">
+        <content Alignment="0" LeftIndent="3.0" RightIndent="1.0" startOffset="157" length="2" />
+      </paragraph>
+    </cell>
+    <cell>
+      <paragraph Alignment="0" LeftIndent="3.0" RightIndent="1.0">
+        <content Alignment="0" LeftIndent="3.0" RightIndent="1.0" startOffset="159" length="2" />
       </paragraph>
     </cell>
   </row>
@@ -301,3 +372,14 @@ Resimler `<image>` elemanı ile temsil edilir ve aşağıdaki özelliklere sahip
 <tab startOffset="130" length="1" />
 ```
 
+### Boşluk
+`<space>` elemanı bir boşluk karakterini temsil eder ve genellikle `<paragraph>` içinde diğer içerik elemanları arasında kullanılır.
+
+Örnek:
+```xml
+<paragraph>
+  <content bold="true" startOffset="19" length="14" />
+  <space />
+  <content italic="true" startOffset="33" length="15" />
+</paragraph>
+```
