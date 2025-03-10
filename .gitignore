@@ -168,3 +168,5 @@ pyproject.toml
 *.lock
 *.pdf
 *.xml
+*.png
+*.docx
