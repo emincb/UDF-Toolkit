@@ -1,53 +1,82 @@
 # UYAP UDF Dosya Formatı
+
 ## İçindekiler
-1. [Genel Bakış](#genel-bakış)
-2. [UDF Dosya Yapısı](#udf-dosya-yapısı)
-3. [XML Yapısı](#xml-yapısı)
-4. [Kök Eleman](#kök-eleman)
-5. [Ana Bölümler](#ana-bölümler)
-   - [İçerik Bölümü](#i̇çerik-bölümü)
-   - [Özellikler Bölümü](#özellikler-bölümü)
-   - [Elemanlar Bölümü](#elemanlar-bölümü)
-   - [Stiller Bölümü](#stiller-bölümü)
-6. [Detaylı Eleman Açıklamaları ve Özellik Örnekleri](#detaylı-eleman-açıklamaları-ve-özellik-örnekleri)
+
+1.  [Genel Bakış](https://www.google.com/search?q=%23genel-bak%C4%B1%C5%9F)
+2.  [UDF Dosya Yapısı](https://www.google.com/search?q=%23udf-dosya-yap%C4%B1s%C4%B1)
+3.  [XML Yapısı](https://www.google.com/search?q=%23xml-yap%C4%B1s%C4%B1)
+4.  [Kök Eleman](https://www.google.com/search?q=%23k%C3%B6k-eleman)
+5.  [Ana Bölümler](https://www.google.com/search?q=%23ana-b%C3%B6l%C3%BCmler)
+      * [İçerik Bölümü (`<content>`)](https://www.google.com/search?q=%23i%CC%87%C3%A7erik-b%C3%B6l%C3%BCm%C3%BC-content)
+      * [Özellikler Bölümü (`<properties>`)](https://www.google.com/search?q=%23%C3%B6zellikler-b%C3%B6l%C3%BCm%C3%BC-properties)
+      * [Elemanlar Bölümü (`<elements>`)](https://www.google.com/search?q=%23elemanlar-b%C3%B6l%C3%BCm%C3%BC-elements)
+      * [Stiller Bölümü (`<styles>`)](https://www.google.com/search?q=%23stiller-b%C3%B6l%C3%BCm%C3%BC-styles)
+      * [Veri Bölümü (`<data>`) (Varsayımsal)](https://www.google.com/search?q=%23veri-b%C3%B6l%C3%BCm%C3%BC-data-varsay%C4%B1msal)
+6.  [Detaylı Eleman Açıklamaları ve Özellik Örnekleri](https://www.google.com/search?q=%23detayl%C4%B1-eleman-a%C3%A7%C4%B1klamalar%C4%B1-ve-%C3%B6zellik-%C3%B6rnekleri)
+      * [Üstbilgi (`<header>`)](https://www.google.com/search?q=%23%C3%BCstbilgi-header)
+      * [Altbilgi (`<footer>`)](https://www.google.com/search?q=%23altbilgi-footer)
+      * [Paragraf (`<paragraph>`)](https://www.google.com/search?q=%23paragraf-paragraph)
+      * [İçerik (`<content>` elemanı)](https://www.google.com/search?q=%23i%CC%87%C3%A7erik-content-eleman%C4%B1)
+      * [Resim (`<image>`)](https://www.google.com/search?q=%23resim-image)
+      * [Tablo (`<table>`)](https://www.google.com/search?q=%23tablo-table)
+      * [Satır (`<row>`)](https://www.google.com/search?q=%23sat%C4%B1r-row)
+      * [Hücre (`<cell>`)](https://www.google.com/search?q=%23h%C3%BCcre-cell)
+      * [Sekme (`<tab>`)](https://www.google.com/search?q=%23sekme-tab)
+      * [Boşluk (`<space>`)](https://www.google.com/search?q=%23bo%C5%9Fluk-space)
+      * [Sayfa Sonu (`<page-break>`)](https://www.google.com/search?q=%23sayfa-sonu-page-break)
+      * [Alan (`<field>`) (Varsayımsal)](https://www.google.com/search?q=%23alan-field-varsay%C4%B1msal)
 
 ## Genel Bakış
-Bu belge, belge şablonlama ve biçimlendirme için kullanılan UDF ve dahili XML formatının yapısını ve elemanlarını açıklar. Bu format, çeşitli biçimlendirme seçenekleri, tablolar, gömülü öğeler, üstbilgiler, altbilgiler ve listeler içeren zengin metin belgelerini temsil etmek için tasarlanmıştır.
+
+Bu belge, belge şablonlama ve biçimlendirme için kullanılan UYAP UDF (Ulusal Yargı Ağı Projesi Doküman Formatı) ve dahili XML formatının yapısını ve elemanlarını açıklar. Bu format, çeşitli biçimlendirme seçenekleri, tablolar, gömülü öğeler, üstbilgiler, altbilgiler ve listeler içeren zengin metin belgelerini temsil etmek için tasarlanmıştır.
 
 ## UDF Dosya Yapısı
+
 UDF formatı, esasen belirli bir iç yapıya sahip bir ZIP arşividir:
 
-1. UDF (ZIP) içindeki ana dosya `content.xml` olarak adlandırılır.
-2. Bu `content.xml` dosyası, XML formatında gerçek belge içeriğini ve biçimlendirme bilgilerini içerir.
-3. ZIP arşivinde diğer kaynaklar (örneğin, resimler veya ek meta veriler) de bulunabilir.
+1.  UDF (ZIP) içindeki ana dosya `content.xml` olarak adlandırılır.
+2.  Bu `content.xml` dosyası, XML formatında gerçek belge içeriğini ve biçimlendirme bilgilerini içerir.
+3.  ZIP arşivinde diğer kaynaklar da bulunabilir. Örneğin, `content.xml` içinde base64 olarak kodlanmamış büyük resim dosyaları ayrı olarak saklanabilir ve `content.xml`'den referans verilebilir (ancak `<image imageData="...">` elemanı base64 gömülü resimleri destekler).
 
 Bir UDF dosyasının içeriğini düzenlemek veya görüntülemek için:
-1. Dosya uzantısını `.udf`'den `.zip`'e değiştirin
-2. ZIP dosyasının içeriğini çıkarın
-3. `content.xml` dosyasını açın ve düzenleyin
-4. Düzenlenmiş dosyaları tekrar ZIP arşivine paketleyin
-5. ZIP dosyasını tekrar `.udf` olarak yeniden adlandırın
+
+1.  Dosya uzantısını `.udf`'den `.zip`'e değiştirin
+2.  ZIP dosyasının içeriğini çıkarın
+3.  `content.xml` dosyasını açın ve düzenleyin
+4.  Düzenlenmiş dosyaları tekrar ZIP arşivine paketleyin
+5.  ZIP dosyasını tekrar `.udf` olarak yeniden adlandırın
 
 ## XML Yapısı
+
 `content.xml` dosyası, aşağıda ayrıntılı olarak açıklayacağımız belirli bir XML yapısını takip eder.
 
 ## Kök Eleman
+
 XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
-- `format_id`: Formatın sürümü
-  - Örnek: `format_id="1.8"`
+
+  - `format_id`: Formatın sürümü
+      * Örnek: `format_id="1.8"`
+  - `webID`: Belge için web tabanlı bir kimlik (isteğe bağlı).
+  - `institutionID`: Kurum kimliği (isteğe bağlı).
+  - `isTemplate`: Belgenin bir şablon olup olmadığını belirtir (`true`/`false`).
+  - `description`: Dokümanın genel bir açıklaması.
 
 ## Ana Bölümler
-`<template>` elemanı dört ana bölüm içerir:
 
-1. `<content>`: Belgenin ham metin içeriği
-2. `<properties>`: Belge genelindeki özellikler
-3. `<elements>`: Belgenin yapısı ve biçimlendirmesi
-4. `<styles>`: Belgede kullanılan metin stilleri
+`<template>` elemanı genellikle dört ana bölüm içerir. UYAP sisteminin şablonlama yeteneklerine bağlı olarak bir `<data>` bölümü de bulunabilir:
 
-### İçerik Bölümü
+1.  `<content>`: Belgenin ham metin içeriği
+2.  `<properties>`: Belge genelindeki özellikler
+3.  `<elements>`: Belgenin yapısı ve biçimlendirmesi
+4.  `<styles>`: Belgede kullanılan metin stilleri
+5.  `<data>` (Varsayımsal): Şablon belgelerde, alanları doldurmak için kullanılacak verileri içerebilir. Yapısı UYAP'a özgü olabilir.
+
+### İçerik Bölümü (`<content>`)
+
 `<content>` bölümü bir CDATA bloğu içine sarılmıştır ve belgenin ham metnini içerir. Bu, üstbilgiler, altbilgiler ve ana gövde metni dahil olmak üzere tüm metinsel içeriği içerir.
 
 Örnek:
+
 ```xml
 <content><![CDATA[
   Bu, belgenin ham içeriğidir.
@@ -55,331 +84,399 @@ XML belgesinin kök elemanı, aşağıdaki özelliğe sahip `<template>`'dir:
 ]]></content>
 ```
 
-**Önemli Not:** İçerik bölümü, tüm metinsel verileri içeren tek bir havuz olarak çalışır. `<elements>` bölümündeki `startOffset` ve `length` özellikleri, bu içerik havuzundaki belirli metin parçalarını referans alır.
+**Önemli Not:** İçerik bölümü, tüm metinsel verileri içeren tek bir havuz olarak çalışır. `<elements>` bölümündeki `<content>` elemanları, `startOffset` ve `length` özellikleri ile bu içerik havuzundaki belirli metin parçalarını referans alır.
 
-### Özellikler Bölümü
+### Özellikler Bölümü (`<properties>`)
+
 `<properties>` elemanı, sayfa düzenini tanımlayan özelliklerle bir `<pageFormat>` elemanı içerir:
 
-- `mediaSizeName`: Sayfa boyutunu tanımlar
-  - Değerler: Standart kağıt boyutlarını temsil eden tamsayı
-  - Örnek: `mediaSizeName="1"` (A4 boyutu)
+  - **`<pageFormat>` Elemanı:**
 
-- `leftMargin`, `rightMargin`, `topMargin`, `bottomMargin`: Sayfa kenar boşlukları (punto cinsinden)
-  - Değerler: Ondalık sayılar
-  - Örnek: `leftMargin="42.51968479156494"` (yaklaşık 1.5 cm)
+      * `mediaSizeName`: Sayfa boyutunu tanımlar.
+          * Değerler: Standart kağıt boyutlarını temsil eden tamsayı veya string (örn: "A4", "LETTER").
+          * Örnek: `mediaSizeName="A4"`
+      * `leftMargin`, `rightMargin`, `topMargin`, `bottomMargin`: Sayfa kenar boşlukları (genellikle punto veya UYAP'a özgü birim cinsinden).
+          * Değerler: Ondalık sayılar.
+          * Örnek: `leftMargin="70.86"` (yaklaşık 2.5 cm)
+      * `paperOrientation`: Sayfa yönü.
+          * Değerler: Dikey için "portrait" veya "1", yatay için "landscape" veya "2".
+          * Örnek: `paperOrientation="portrait"`
+      * `headerFOffset`, `footerFOffset`: Üstbilgi ve altbilginin sayfa kenarından uzaklığı (offset).
+          * Değerler: Ondalık sayılar.
+          * Örnek: `headerFOffset="30.0"`
+      * `pageBorderType`: Sayfa kenarlığının türü (örn: "single", "double", "none").
+      * `pageBorderColor`: Sayfa kenarlığının rengi.
+      * `pageBorderArt`: Sanatsal sayfa kenarlığı (eğer destekleniyorsa).
+      * `pageBorderDisplayHorizontal`, `pageBorderDisplayVertical`, `pageBorderDisplayOnFirstPage`: Sayfa kenarlığının gösterim seçenekleri.
+      * `pageBorderDistanceFrom`: Kenarlığın metinden veya sayfa kenarından uzaklığı.
+      * `pageBorderTop`, `pageBorderBottom`, `pageBorderLeft`, `pageBorderRight`: Her bir kenar için kenarlık kalınlığı veya stili.
+      * `pageColumns`: Sayfa üzerindeki sütun sayısı.
+      * `pageColumnSpacing`: Sütunlar arası boşluk.
 
-- `paperOrientation`: Sayfa yönü
-  - Değerler: Dikey için "1", yatay için "2"
-  - Örnek: `paperOrientation="1"` (dikey)
+  - **`<bgImage>` Elemanı (Sayfa Arka Plan Resmi):**
 
-- `headerFOffset`, `footerFOffset`: Üstbilgi ve altbilgi ofsetleri (punto cinsinden)
-  - Değerler: Ondalık sayılar
-  - Örnek: `headerFOffset="20.0"` (yaklaşık 0.7 cm)
+      * `bgImageSource`: Görüntünün kaynak konumu (eğer ZIP içinde ayrı bir dosyaysa).
+          * Örnek: `bgImageSource="/resources/images/background.jpg"`
+      * `bgImageData`: Base64 kodlanmış görüntü verisi.
+          * Örnek: `bgImageData="iVBORw0KGgoAAAANSUhEUgAA..."`
+      * `bgImageBottomMargin`, `bgImageUpMargin`, `bgImageRightMargin`, `bgImageLeftMargin`: Arka plan görüntüsünün kenar boşlukları.
+      * `bgImageAlign`: Arka plan resminin hizalanması (örn: "center", "tile").
+      * `bgImageRepeat`: Arka plan resminin tekrarlanma şekli (örn: "repeat", "no-repeat").
+      * `bgImageWatermark`: Resmin filigran olarak kullanılıp kullanılmayacağı (`true`/`false`).
+      * `bgImageOpacity`: Resmin opaklığı (0.0 - 1.0).
 
-#### Arka Plan Görüntüsü
-`<properties>` bölümünde bir `<bgImage>` elemanı bulunabilir. Bu eleman, belge için arka plan görüntüsünü tanımlar:
+  - **`<pageImage>` Elemanı (Özel Sayfa Görüntüleri/Filigranlar - UYAP `ac` sabitleriyle ilişkili):**
 
-- `bgImageSource`: Görüntünün kaynak konumu
-  - Örnek: `bgImageSource="/resources/modules/dis/1.jpg"`
-
-- `bgImageData`: Base64 kodlanmış görüntü verisi
-  - Örnek: `bgImageData="iVBORw0KGgoAAAANSUhEUgAA..."`
-
-- `bgImageBottomMargin`, `bgImageUpMargin`, `bgImageRigtMargin`, `bgImageLeftMargin`: Arka plan görüntüsünün kenar boşlukları
-  - Örnek: `bgImageBottomMargin="28" bgImageUpMargin="28" bgImageRigtMargin="28" bgImageLeftMargin="28"`
+      * `pageImageClassName`: Kullanılacak özel `IPageImage` Java sınıfının adı (UYAP'a özgü).
+      * `pageImageGradientData`: Gradyan bir sayfa resmi için veri (UYAP'a özgü).
 
 Örnek:
+
 ```xml
 <properties>
-  <pageFormat mediaSizeName="1" leftMargin="42.51968479156494" rightMargin="42.51968479156494" topMargin="42.51968479156494" bottomMargin="70.8661413192749" paperOrientation="1" headerFOffset="20.0" footerFOffset="20.0" />
-  <bgImage bgImageSource="/resources/modules/dis/1.jpg" bgImageData="iVBORw0KGgoAAAANSUhEUgAA..." bgImageBottomMargin="28" bgImageUpMargin="28" bgImageRigtMargin="28" bgImageLeftMargin="28" />
+  <pageFormat mediaSizeName="A4" leftMargin="70.86" rightMargin="70.86" topMargin="56.69" bottomMargin="56.69" paperOrientation="portrait" headerFOffset="30.0" footerFOffset="30.0" />
+  <bgImage bgImageData="iVBORw0KGgoAAAANSUhEUgAA..." bgImageAlign="center" bgImageRepeat="no-repeat" />
 </properties>
 ```
 
-### Elemanlar Bölümü
+### Elemanlar Bölümü (`<elements>`)
+
 `<elements>` bölümü, belgenin yapısını ve biçimlendirmesini tanımlar. Aşağıdaki elemanları içerebilir:
 
-1. Üstbilgi
-2. Altbilgi
-3. Paragraf
-4. İçerik
-5. Tablo
-6. Resim
-7. Sekme
-8. Sayfa Sonu
+1.  `<header>` (Üstbilgi)
+2.  `<footer>` (Altbilgi)
+3.  `<paragraph>` (Paragraf)
+4.  `<content>` (Biçimli metin parçası - bu `<elements>` içindeki `<content>` elemanıdır, kök `<content>` CDATA bloğu değildir)
+5.  `<table>` (Tablo)
+6.  `<image>` (Resim)
+7.  `<tab>` (Sekme karakteri)
+8.  `<space>` (Boşluk karakteri)
+9.  `<page-break>` (Sayfa Sonu)
+10. `<field>` (Şablon Alanı - varsayımsal, UYAP'a özgü olabilir)
 
-`<elements>` elemanı bir `resolver` özelliğine sahip olabilir, bu özellik belgenin hangi stil çözümleyiciyi kullanacağını belirtir.
+`<elements>` elemanı bir `resolver` özelliğine sahip olabilir, bu özellik belgenin hangi stil çözümleyiciyi (varsayılan stil setini) kullanacağını belirtir.
 Örnek: `<elements resolver="hvl-default">`
 
-### Stiller Bölümü
+### Stiller Bölümü (`<styles>`)
+
 `<styles>` bölümü, belgede kullanılan metin stillerini tanımlar:
 
-- `name`: Stilin adı
-- `description`: Stilin açıklaması
-- `family`: Yazı tipi ailesi
-- `size`: Yazı tipi boyutu (punto cinsinden)
-- `bold`, `italic`: Metin stili
-- `foreground`: Metin rengi (RGB formatında)
-- `FONT_ATTRIBUTE_KEY`: Java Swing yazı tipi özelliği
+  - **`<style>` Elemanı:**
+      * `name`: Stilin benzersiz adı (örn: "hvl-default", "Baslik1").
+      * `description`: Stilin açıklaması.
+      * `family`: Yazı tipi ailesi (örn: "Times New Roman", "Arial").
+      * `size`: Yazı tipi boyutu (genellikle punto cinsinden).
+      * `bold`, `italic`, `underline`, `strikethrough`: Metin stili (`true`/`false`).
+      * `foreground`: Metin rengi (RGB formatında, genellikle işaretli bir tam sayı olarak).
+      * `background`: Metin arka plan rengi (RGB formatında).
+      * `subscript`, `superscript`: Alt simge, üst simge (`true`/`false`).
+      * `parent`: Bu stilin miras aldığı başka bir stilin adı (hiyerarşik stil yönetimi için).
+          * Örnek: `<style name="MyCustomStyle" parent="hvl-default" ... />`
+      * `FONT_ATTRIBUTE_KEY`: Bu, bir UYAP Java Swing ayrıştırıcısının içsel bir detayı olabilir ve stilin Swing `Font` nesnesiyle nasıl eşleştiğini belirtebilir; genel UDF formatının bir parçası olmayabilir.
 
 Örnek:
+
 ```xml
 <styles>
-  <style name="default" description="Geçerli" family="Dialog" size="12" bold="false" italic="false" foreground="-13421773" FONT_ATTRIBUTE_KEY="javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12]" />
-  <style name="hvl-default" family="Times New Roman" size="12" description="Gövde" />
+  <style name="default" description="Varsayılan" family="Dialog" size="12" bold="false" italic="false" foreground="-13421773" />
+  <style name="hvl-default" parent="default" family="Times New Roman" size="12" description="Gövde Metni" />
+  <style name="Baslik1" parent="hvl-default" size="16" bold="true" foreground="-16777216" />
 </styles>
+```
+
+### Veri Bölümü (`<data>`) (Varsayımsal)
+
+Eğer UDF dosyası bir şablon olarak kullanılıyorsa, `<elements>` bölümündeki `<field>` elemanlarını doldurmak için bir `<data>` bölümü bulunabilir. Bu bölümün yapısı genellikle UYAP sistemine özgüdür ve XML veya başka bir formatta olabilir.
+
+Örnek (tamamen varsayımsal):
+
+```xml
+<data>
+  <record>
+    <adi>Ahmet</adi>
+    <soyadi>Yılmaz</soyadi>
+    <davaNo>2023/123</davaNo>
+  </record>
+</data>
 ```
 
 ## Detaylı Eleman Açıklamaları ve Özellik Örnekleri
 
-### Üstbilgi
-`<header>` elemanı ile temsil edilir, üstbilgi içeriği için paragraflar içerir. Arka plan rengi ve metin rengi ayarlanabilir.
+### Üstbilgi (`<header>`)
+
+`<header>` elemanı ile temsil edilir, üstbilgi içeriği için paragraflar içerir.
 
 Özellikler:
-- `background`: Üstbilgi arka plan rengi (RGB formatında)
-  - Örnek: `background="-8323073"` (açık mavi)
 
-- `foreground`: Üstbilgi metin rengi (RGB formatında)
-  - Örnek: `foreground="-16776961"` (mavi)
+  - `background`: Üstbilgi arka plan rengi (RGB formatında).
+      * Örnek: `background="-8323073"` (açık mavi)
+  - `foreground`: Üstbilgi metin rengi (RGB formatında).
+      * Örnek: `foreground="-16776961"` (mavi)
 
 Örnek:
+
 ```xml
 <header background="-8323073" foreground="-16776961">
-  <paragraph family="Times New Roman" size="12" description="Gövde">
-    <content family="Times New Roman" size="12" description="Gövde" startOffset="0" length="14" />
-  </paragraph>
+  <paragraph Alignment="1"> <content family="Times New Roman" size="10" startOffset="0" length="25" /> </paragraph>
 </header>
 ```
 
-### Altbilgi
+### Altbilgi (`<footer>`)
+
 `<footer>` elemanı ile temsil edilir ve aşağıdaki özelliklere sahiptir:
 
-- `background`: Altbilgi arka plan rengi (RGB formatında)
-  - Örnek: `background="-8339328"` (açık yeşil)
-
-- `foreground`: Altbilgi metin rengi (RGB formatında)
-  - Örnek: `foreground="-16776961"` (mavi)
-
-- `pageNumber-spec`: Sayfa numarası özelliği
-  - Örnek: `pageNumber-spec="BSP32_40"`
-
-- `pageNumber-color`: Sayfa numarası rengi (RGB formatında)
-  - Örnek: `pageNumber-color="-16777216"` (siyah)
-
-- `pageNumber-fontFace`: Sayfa numarası için yazı tipi
-  - Örnek: `pageNumber-fontFace="Arial"`
-
-- `pageNumber-fontSize`: Sayfa numarası için yazı tipi boyutu
-  - Örnek: `pageNumber-fontSize="11"`
-
-- `pageNumber-foreStr`: Sayfa numarasından önce gelen metin
-  - Örnek: `pageNumber-foreStr="sayfa"`
-
-- `pageNumber-pageStartNumStr`: Başlangıç sayfa numarası
-  - Örnek: `pageNumber-pageStartNumStr="1"`
+  - `background`: Altbilgi arka plan rengi (RGB formatında).
+  - `foreground`: Altbilgi metin rengi (RGB formatında).
+  - `pageNumber-spec`: Sayfa numarası formatı ve konumu için özel bir belirteç (UYAP'a özgü olabilir).
+      * Örnek: `pageNumber-spec="BSP32_40"`
+  - `pageNumber-color`: Sayfa numarası rengi (RGB formatında).
+  - `pageNumber-fontFace`: Sayfa numarası için yazı tipi.
+  - `pageNumber-fontSize`: Sayfa numarası için yazı tipi boyutu.
+  - `pageNumber-foreStr`: Sayfa numarasından önce gelen metin (örn: "Sayfa ").
+  - `pageNumber-afterStr`: Sayfa numarasından sonra gelen metin (örn: " / ToplamSayfa").
+  - `pageNumber-pageStartNumStr`: Başlangıç sayfa numarası.
 
 Örnek:
+
 ```xml
-<footer background="-8339328" foreground="-16776961" pageNumber-spec="BSP32_40" pageNumber-color="-16777216" pageNumber-fontFace="Arial" pageNumber-fontSize="11" pageNumber-foreStr="sayfa" pageNumber-pageStartNumStr="1">
-  <paragraph FirstLineIndent="2.5" family="Times New Roman" size="12">
-    <content FirstLineIndent="2.5" family="Times New Roman" size="12" startOffset="166" length="17" />
-  </paragraph>
+<footer pageNumber-spec="PageNumCenter" pageNumber-color="-16777216" pageNumber-fontFace="Arial" pageNumber-fontSize="10" pageNumber-foreStr="Sayfa: ">
+  <paragraph Alignment="2"> <content family="Arial" size="9" startOffset="26" length="15" /> </paragraph>
 </footer>
 ```
 
-### Paragraf
+### Paragraf (`<paragraph>`)
+
 `<paragraph>` elemanı ile temsil edilir ve aşağıdaki özelliklere sahiptir:
 
-- `Alignment`: Metin hizalama
-  - Değerler: Sola için "0", ortaya için "1", sağa için "2", iki yana yasla için "3"
-  - Örnek: `Alignment="3"` (iki yana yasla)
-
-- `LeftIndent`, `RightIndent`: Girinti değerleri (punto cinsinden)
-  - Örnek: `LeftIndent="36.0"` (yaklaşık 1.27 cm)
-
-- `LineSpacing`: Satır aralığı
-  - Değerler: Ondalık sayılar (1.0 tek aralık, 2.0 çift aralık)
-  - Örnek: `LineSpacing="1.0"` (tek aralık)
-
-- `TabSet`: Sekme durak pozisyonları ve türleri
-  - Örnek: `TabSet="36.0:0:0"` (36 puntoda sekme durağı, sola hizalı)
-
-- `Bulleted`: Madde işaretli liste öğeleri için "true"
-  - Örnek: `Bulleted="true"`
-
-- `BulletType`: Madde işareti türü
-  - Örnek: `BulletType="BULLET_TYPE_ELLIPSE"`
-
-- `Numbered`: Numaralandırılmış liste öğeleri için "true"
-  - Örnek: `Numbered="true"`
-
-- `NumberType`: Numaralandırma türü
-  - Örnek: `NumberType="NUMBER_TYPE_NUMBER_DOT"`
-
-- `ListLevel`: Liste öğesinin girinti seviyesi
-  - Örnek: `ListLevel="1"`
-
-- `ListId`: Liste için tanımlayıcı
-  - Örnek: `ListId="1"`
-
-- `FirstLineIndent`: İlk satır girintisi
-  - Örnek: `FirstLineIndent="2.5"`
-
-- `family`: Paragraf için yazı tipi ailesi
-  - Örnek: `family="Times New Roman"`
-
-- `size`: Paragraf için varsayılan yazı tipi boyutu
-  - Örnek: `size="12"`
+  - `Alignment`: Metin hizalama.
+      * Değerler: Sola için "0", ortaya için "1", sağa için "2", iki yana yasla için "3".
+      * Örnek: `Alignment="3"` (iki yana yasla)
+  - `LeftIndent`, `RightIndent`: Paragrafın sol ve sağ girintileri (punto cinsinden).
+  - `FirstLineIndent`: İlk satır girintisi (punto cinsinden).
+  - `SpaceBefore` (veya `SpaceAbove`), `SpaceAfter` (veya `SpaceBelow`): Paragraftan önceki ve sonraki boşluk (punto cinsinden).
+  - `LineSpacing`: Satır aralığı (örn: 1.0 tek, 1.5, 2.0 çift).
+  - `TabSet`: Sekme durak pozisyonları, hizalamaları ve öncü karakterleri (örn: "36.0:0:0,72.0:1:1" - 36pt sola hizalı, 72pt ortaya hizalı nokta öncülü).
+  - `Bulleted`: Madde işaretli liste öğesi ise "true".
+  - `BulletType`: Madde işareti türü (örn: "BULLET\_TYPE\_ELLIPSE", "BULLET\_TYPE\_SQUARE", veya UYAP'a özgü bir sabit).
+  - `Numbered`: Numaralandırılmış liste öğesi ise "true".
+  - `NumberType`: Numaralandırma türü (örn: "NUMBER\_TYPE\_NUMBER\_DOT", "NUMBER\_TYPE\_ROMAN\_UPPER", UYAP'a özgü).
+  - `ListLevel`: Liste öğesinin girinti seviyesi (0'dan başlar).
+  - `ListId`: Aynı listeye ait öğeleri gruplamak için bir tanımlayıcı.
+  - `StartNumber`: Numaralandırılmış listeler için başlangıç numarası.
+  - `ListRestart`: Bu seviyedeki listenin numarasının yeniden başlatılıp başlatılmayacağı.
+  - `ListBulletFont`, `ListBulletColor`, `ListBulletSize`: Madde imi/numara için özel yazı tipi, renk ve boyut.
+  - `ListStyleName`: Önceden tanımlanmış bir liste stiline referans.
+  - `KeepWithNext`: Paragrafın bir sonraki paragrafla aynı sayfada tutulup tutulmayacağı (`true`/`false`).
+  - `HangingIndent`: Asılı girinti miktarı (punto cinsinden).
+  - `ParagraphGroupName`, `ParagraphGroupRepeatable`: Şablonlama için paragraf gruplama özellikleri (UYAP'a özgü).
+  - `family`, `size`, `bold`, `italic`, vb.: Paragraf içindeki tüm metinler için varsayılan stil özellikleri (içerideki `<content>` elemanları bunları geçersiz kılabilir).
 
 Örnek:
+
 ```xml
-<paragraph Alignment="0" LeftIndent="36.0" LineSpacing="1.0" family="Verdana">
-  <content family="Verdana" startOffset="77" length="19" />
+<paragraph Alignment="0" LeftIndent="36.0" LineSpacing="1.5" SpaceBefore="6.0" SpaceAfter="6.0" Bulleted="true" BulletType="BULLET_TYPE_FILLED_CIRCLE" ListLevel="0" ListId="1">
+  <content startOffset="77" length="35" style="MyListStyle" /> </paragraph>
+```
+
+### İçerik (`<content>` elemanı)
+
+`<elements>` içindeki `<content>` elemanı, belirli biçimlendirmeye sahip metin parçalarını temsil eder:
+
+  - `startOffset`, `length`: Ana `<content>` CDATA bloğundaki metnin başlangıç konumu ve uzunluğu.
+  - `family`, `size`, `bold`, `italic`, `underline`, `strikethrough`, `subscript`, `superscript`: Metin biçimlendirme özellikleri.
+  - `foreground`, `background`: Metin ve arka plan rengi (RGB formatında).
+  - `resolver`: Kullanılacak stil çözümleyiciyi (varsa).
+  - `style`: `<styles>` bölümünde tanımlanmış bir stile referans.
+      * Örnek: `style="VurguluMetin"`
+  - **Alan Özellikleri (Eğer metin bir şablon alanıysa - UYAP `V` sabitleriyle ilişkili):**
+      * `fieldName`: Alanın adı.
+      * `fieldType`: Alanın türü (örn: "text", "date", "number", UYAP'a özgü).
+      * `fieldVisible`: Alanın görünür olup olmadığı (`true`/`false`).
+      * `fieldEditable`: Alanın düzenlenebilir olup olmadığı (`true`/`false`).
+      * `fieldGroup`: Alanın ait olduğu grup.
+      * `fieldDescription`: Alan için açıklama.
+  - **Barkod Özellikleri (Eğer metin bir barkod ise - UYAP `V` sabitleriyle ilişkili):**
+      * `barcodeData`: Barkodun içeriği olan veri.
+      * `barcodeType`: Barkod türü (örn: "Code128", "QRCode").
+  - `backgroundImageData`: Bu metin parçası için özel bir arka plan resmi (base64).
+
+Örnek:
+
+```xml
+<paragraph>
+  <content startOffset="100" length="10" style="NormalMetin" />
+  <content startOffset="110" length="15" style="VurguluMetin" bold="true" foreground="-65536" /> <content startOffset="125" length="20" fieldName="MusteriAdi" fieldType="text" /> </paragraph>
+```
+
+### Resim (`<image>`)
+
+Resimler `<image>` elemanı ile temsil edilir:
+
+  - `imageData`: Base64 ile kodlanmış resim verisi.
+  - `width`, `height`: Resmin görüntülenme genişliği ve yüksekliği (punto veya piksel).
+  - `alignment`: Resmin hizalanması (paragraf içinde).
+  - `description`: Resim için alternatif metin veya açıklama.
+  - `family`, `size`: Eğer resim yüklenemezse gösterilecek yer tutucu metnin stili.
+
+Örnek:
+
+```xml
+<paragraph Alignment="1"> <image imageData="iVBORw0KGgoAAAANSUhEUgAA..." width="200" height="150" description="Şirket Logosu" />
 </paragraph>
 ```
 
-### Sayfa Sonu
-`<page-break>` elemanı bir sayfa sonunu temsil eder ve içinde bir paragraf içerir.
+### Tablo (`<table>`)
+
+Tablolar `<table>` elemanı ile temsil edilir:
+
+  - `tableName`: Tablonun adı (isteğe bağlı).
+  - `columnCount`: Tablodaki sütun sayısı.
+  - `columnSpans`: Her bir sütunun genişliğini tanımlayan virgülle ayrılmış değerler listesi (punto veya yüzde).
+      * Örnek: `columnSpans="150,200,100"`
+  - `width`: Tablonun toplam genişliği (isteğe bağlı, `columnSpans` genellikle yeterlidir).
+  - `widthType`: Tablo genişliğinin türü (örn: "fixed", "percentage").
+  - `border`: Tüm tablo için varsayılan kenarlık stili (örn: "borderCell", "borderOuter", "none"). Daha spesifik kenarlıklar hücre bazında tanımlanabilir.
+  - `borderType`: Daha detaylı kenarlık tipi (UYAP'a özgü olabilir).
+  - `borderColor`, `borderWidth`: Varsayılan kenarlık rengi ve kalınlığı.
+  - `cellSpacing`, `cellPadding`: Hücreler arası boşluk ve hücre içi dolgu.
+  - `alignment`: Tablonun sayfa üzerindeki hizalanması (örn: "left", "center", "right").
 
 Örnek:
+
+```xml
+<table tableName="MusteriListesi" columnCount="3" columnSpans="50,*,100" border="borderCell" alignment="center">
+  </table>
+```
+
+(Not: `*` sütun genişliği için "kalan alanı kullan" anlamına gelebilir, UDF formatına bağlıdır)
+
+### Satır (`<row>`)
+
+`<table>` içindeki satırlar `<row>` elemanı ile temsil edilir:
+
+  - `rowName`: Satırın adı (isteğe bağlı).
+  - `rowType`: Satırın türü (örn: "headerRow", "dataRow", "footerRow"). Başlık satırları sayfa sonlarında tekrarlanabilir.
+  - `height`: Satırın sabit yüksekliği (punto).
+  - `height_min`, `height_max`: Minimum ve maksimum satır yüksekliği.
+  - `cantSplit`: Satırın sayfa sonlarında bölünemeyeceğini belirtir (`true`/`false`).
+
+Örnek:
+
+```xml
+<row rowType="headerRow" height="30" cantSplit="true">
+  </row>
+```
+
+### Hücre (`<cell>`)
+
+`<row>` içindeki hücreler `<cell>` elemanı ile temsil edilir:
+
+  - `width`: Hücrenin genişliği (eğer `<table>`deki `columnSpans`'ı geçersiz kılıyorsa).
+  - `height`: Hücrenin yüksekliği (eğer `<row>`daki `height`'ı geçersiz kılıyorsa).
+  - `bgColor` (veya `cellColor`): Hücrenin arka plan rengi (RGB formatında).
+      * Örnek: `bgColor="-256"` (sarı)
+  - `vAlign`: İçeriğin dikey hizalanması ("top", "middle", "bottom").
+      * Örnek: `vAlign="middle"`
+  - `hAlign` (veya `textAlign`): İçeriğin yatay hizalanması (hücre içindeki paragraflar bunu geçersiz kılabilir).
+  - `colspan`: Hücrenin yatay olarak kaç sütun boyunca birleşeceği.
+      * Örnek: `colspan="2"`
+  - `rowspan`: Hücrenin dikey olarak kaç satır boyunca birleşeceği.
+      * Örnek: `rowspan="3"`
+  - `borderTop`, `borderBottom`, `borderLeft`, `borderRight`: Her bir kenar için stil, renk, kalınlık.
+      * Örnek: `borderBottom="solid 1px #000000"`
+  - `paddingTop`, `paddingBottom`, `paddingLeft`, `paddingRight`: Hücre içi dolgu miktarları.
+
+Örnek:
+
+```xml
+<row>
+  <cell width="150" height="50" bgColor="-256" vAlign="middle">
+    <paragraph Alignment="1">
+      <content startOffset="200" length="12" /> </paragraph>
+  </cell>
+  <cell colspan="2" vAlign="top">
+    <paragraph>
+      <content startOffset="212" length="25" /> </paragraph>
+  </cell>
+</row>
+<row>
+  <cell rowspan="2" bgColor="-16711681" vAlign="bottom">
+    <paragraph Alignment="2">
+      <content startOffset="237" length="22" /> </paragraph>
+  </cell>
+  <cell>
+    <paragraph>
+      <content startOffset="259" length="13" /> </paragraph>
+  </cell>
+  <cell>
+    <paragraph>
+      <content startOffset="272" length="13" /> </paragraph>
+  </cell>
+</row>
+<row>
+  <cell>
+    <paragraph>
+      <content startOffset="285" length="13" /> </paragraph>
+  </cell>
+  <cell>
+    <paragraph>
+      <content startOffset="298" length="13" /> </paragraph>
+  </cell>
+</row>
+```
+
+### Sekme (`<tab>`)
+
+`<tab>` elemanı bir sekme karakterini temsil eder:
+
+  - `startOffset`, `length`: Ana `<content>` CDATA bloğundaki konumu. `length` genellikle 1'dir.
+
+Örnek:
+
+```xml
+<paragraph>
+  <content startOffset="311" length="5" /> <tab startOffset="316" length="1" />
+  <content startOffset="317" length="10" /> </paragraph>
+```
+
+### Boşluk (`<space>`)
+
+`<space>` elemanı, genellikle `<content>` elemanları arasında ek bir boşluk (space karakteri) eklemek için kullanılır. `startOffset` ve `length` (genellikle 1) öznitelikleriyle ana CDATA bloğundaki bir boşluğu referans alabilir veya sadece anlamsal bir boşluk olarak var olabilir.
+
+Örnek:
+
+```xml
+<paragraph>
+  <content startOffset="327" length="4" /> <space startOffset="331" length="1" /> <content startOffset="332" length="4" /> </paragraph>
+```
+
+### Sayfa Sonu (`<page-break>`)
+
+`<page-break>` elemanı, belgede o noktada yeni bir sayfaya geçilmesini zorlar. Genellikle içinde boş veya kısa bir `<paragraph>` ve `<content>` elemanı barındırabilir.
+
+Örnek:
+
 ```xml
 <page-break>
   <paragraph>
-    <content startOffset="147" length="1" />
-  </paragraph>
+    <content startOffset="336" length="0" /> </paragraph>
 </page-break>
 ```
 
-### İçerik
-`<content>` elemanı, belirli biçimlendirmeye sahip metni temsil eder:
+### Alan (`<field>`) (Varsayımsal)
 
-- `size`: Yazı tipi boyutu (punto cinsinden)
-  - Örnek: `size="12"`
+Eğer UDF şablonlama için kullanılıyorsa, `<elements>` içinde `<field>` adında özel bir eleman bulunabilir. Bu eleman, `<data>` bölümünden veya harici bir kaynaktan gelen veriyle doldurulacak yer tutucuları temsil eder. Öznitelikleri `<content>` elemanının alan özelliklerine benzer olabilir:
 
-- `bold`, `italic`, `underline`: Metin stili
-  - Örnek: `bold="true"` `italic="false"` `underline="true"`
+  - `name` (veya `fieldName`): Alanın benzersiz adı.
+  - `type` (veya `fieldType`): Alanın veri türü (örn: "text", "date", "image").
+  - `default`: Veri bulunamazsa gösterilecek varsayılan değer.
+  - Formatlama öznitelikleri (font, size, color vb.).
 
-- `startOffset`, `length`: Ham içerikteki metnin konumu ve uzunluğu
-  - Örnek: `startOffset="16" length="39"`
+Örnek (tamamen varsayımsal):
 
-- `resolver`: Kullanılacak stil çözümleyiciyi belirtir
-  - Örnek: `resolver="hvl-default"`
-
-- `strikethrough`: Üstü çizili metin için "true"
-  - Örnek: `strikethrough="true"`
-
-- `subscript`: Alt simge metni için "true"
-  - Örnek: `subscript="true"`
-
-- `superscript`: Üst simge metni için "true"
-  - Örnek: `superscript="true"`
-
-- `background`: Arka plan rengi (RGB formatında)
-  - Örnek: `background="-8239546"` (açık mavi)
-
-- `foreground`: Metin rengi (RGB formatında)
-  - Örnek: `foreground="-196608"` (koyu yeşil)
-
-- `family`: Yazı tipi ailesi
-  - Örnek: `family="Verdana"`
-
-Örnek:
-```xml
-<content bold="true" startOffset="19" length="14" />
-<content italic="true" startOffset="33" length="15" />
-<content underline="true" startOffset="52" length="23" />
-<content family="Verdana" foreground="-196608" startOffset="105" length="9" />
-```
-
-### Tablo
-Tablolar `<table>` elemanı ile temsil edilir ve aşağıdaki özelliklere sahiptir:
-
-- `tableName`: Tablonun adı
-  - Örnek: `tableName="Sabit"`
-
-- `columnCount`: Sütun sayısı
-  - Örnek: `columnCount="2"`
-
-- `columnSpans`: Sütun genişlikleri (punto cinsinden)
-  - Örnek: `columnSpans="100,100"`
-
-- `border`: Kenarlık stili
-  - Değerler: "borderCell" (tüm hücrelere kenarlık), "border" (dış kenarlık), "borderOuter" (sadece dış kenarlık)
-  - Örnek: `border="borderCell"`
-
-- `rowSpans`: Satır yükseklikleri (punto cinsinden)
-  - Örnek: `rowSpans="428,428"`
-
-Satırlar `<row>` elemanı ile temsil edilir ve aşağıdaki özelliklere sahiptir:
-
-- `rowName`: Satırın adı
-  - Örnek: `rowName="row1"`
-
-- `rowType`: Satırın türü
-  - Örnek: `rowType="dataRow"`
-
-- `height_min`: Minimum satır yüksekliği
-  - Örnek: `height_min="1.5"`
-
-Hücreler `<cell>` elemanı ile temsil edilir ve her biri bir veya daha fazla paragraf içerebilir.
-
-Örnek:
-```xml
-<table tableName="Sabit" columnCount="2" columnSpans="100,100" border="borderCell" rowSpans="428,428">
-  <row rowName="row1" rowType="dataRow" height_min="1.5">
-    <cell>
-      <paragraph Alignment="0" LeftIndent="3.0" RightIndent="1.0">
-        <content Alignment="0" LeftIndent="3.0" RightIndent="1.0" startOffset="157" length="2" />
-      </paragraph>
-    </cell>
-    <cell>
-      <paragraph Alignment="0" LeftIndent="3.0" RightIndent="1.0">
-        <content Alignment="0" LeftIndent="3.0" RightIndent="1.0" startOffset="159" length="2" />
-      </paragraph>
-    </cell>
-  </row>
-</table>
-```
-
-### Resim
-Resimler `<image>` elemanı ile temsil edilir ve aşağıdaki özelliklere sahiptir:
-
-- `family`: Resim yer tutucu için yazı tipi ailesi
-  - Örnek: `family="Times New Roman"`
-
-- `size`: Resim yer tutucu için yazı tipi boyutu
-  - Örnek: `size="12"`
-
-- `imageData`: Base64 ile kodlanmış resim verisi
-  - Örnek: `imageData="iVBORw0KGgoAAAANSUhEUgAA..."`
-
-Örnek:
-```xml
-<image family="Times New Roman" size="12" imageData="iVBORw0KGgoAAAANSUhEUgAA..." />
-```
-
-### Sekme
-`<tab>` elemanı bir sekme karakterini temsil eder ve aşağıdaki özelliklere sahiptir:
-
-- `startOffset`: Ham içerikteki sekmenin konumu
-  - Örnek: `startOffset="130"`
-
-- `length`: Tek bir sekme karakteri için her zaman 1'dir
-  - Örnek: `length="1"`
-
-Örnek:
-```xml
-<tab startOffset="130" length="1" />
-```
-
-### Boşluk
-`<space>` elemanı bir boşluk karakterini temsil eder ve genellikle `<paragraph>` içinde diğer içerik elemanları arasında kullanılır.
-
-Örnek:
 ```xml
 <paragraph>
-  <content bold="true" startOffset="19" length="14" />
-  <space />
-  <content italic="true" startOffset="33" length="15" />
-</paragraph>
+  <content startOffset="350" length="10" /> <field name="MusteriAdi" type="text" startOffset="360" length="0" style="AlanStili" /> </paragraph>
 ```
+
+**Not:** `<field>` elemanının varlığı ve yapısı UYAP sisteminin özel uygulamasına bağlıdır. Genellikle bu tür alanlar `<content>` elemanlarına eklenmiş özel özniteliklerle de (yukarıda `<content>` bölümünde belirtildiği gibi `fieldName` vb.) temsil edilebilir.
