@@ -1,5 +1,8 @@
 # UDF Toolkit
  UYAP UDF dosya formatı ile ilgili çalışmalar
+
+[![Star History Chart](https://api.star-history.com/svg?repos=saidsurucu/udf-toolkit&type=Date)](https://www.star-history.com/#saidsurucu/udf-toolkit&Date)
+
 ## UDF dosyasını DOCX formatına çevirmek için
 ```
 python udf_to_docx.py input.udf
